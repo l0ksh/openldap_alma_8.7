@@ -1,4 +1,4 @@
-FROM fedora:34
+FROM almalinux:8.7
 
 # OpenLDAP server image for OpenShift Origin
 #
@@ -27,15 +27,16 @@ COPY ./contrib/DB_CONFIG /usr/local/etc/openldap/
 # Add test query
 COPY test/test.ldif /test/test.ldif
 
-# Install OpenLDAP Server, give it permissionst to bind to low ports
-RUN dnf install -y \
-        git findutils make \
-        openldap \
-        openldap-servers \
-        openldap-clients \
-        openssl \
-        procps-ng && \
-    dnf clean all -y && \
+RUN yum install -y wget vim
+
+RUN wget -q https://repo.symas.com/configs/SOFL/rhel8/sofl.repo -O /etc/yum.repos.d/sofl.repo &&\
+    yum install -y \
+    openldap \
+    symas-openldap-clients \
+    symas-openldap-servers \
+    git findutils make \
+    openssl procps-ng &&\
+    yum clean all -y &&\
     setcap 'cap_net_bind_service=+ep' /usr/sbin/slapd && \
     mkdir -p /var/lib/ldap && \
     chmod a+rwx -R /var/lib/ldap && \
@@ -44,6 +45,24 @@ RUN dnf install -y \
     mkdir -p /var/run/openldap && \
     chmod a+rwx -R /var/run/openldap && \
     chmod -R a+rw /opt/openshift
+
+# Install OpenLDAP Server, give it permissionst to bind to low ports
+#RUN dnf install -y \
+#        git findutils make \
+#        openldap \
+#        openldap-servers \
+#        openldap-clients \
+#        openssl \
+#        procps-ng && \
+#    dnf clean all -y && \
+#    setcap 'cap_net_bind_service=+ep' /usr/sbin/slapd && \
+#    mkdir -p /var/lib/ldap && \
+#    chmod a+rwx -R /var/lib/ldap && \
+#    mkdir -p /etc/openldap && \
+#    chmod a+rwx -R /etc/openldap && \
+#    mkdir -p /var/run/openldap && \
+#    chmod a+rwx -R /var/run/openldap && \
+#    chmod -R a+rw /opt/openshift
 
 # Set OpenLDAP data and config directories in a data volume
 VOLUME ["/var/lib/ldap", "/etc/openldap"]
