@@ -46,24 +46,6 @@ RUN wget -q https://repo.symas.com/configs/SOFL/rhel8/sofl.repo -O /etc/yum.repo
     chmod a+rwx -R /var/run/openldap && \
     chmod -R a+rw /opt/openshift
 
-# Install OpenLDAP Server, give it permissionst to bind to low ports
-#RUN dnf install -y \
-#        git findutils make \
-#        openldap \
-#        openldap-servers \
-#        openldap-clients \
-#        openssl \
-#        procps-ng && \
-#    dnf clean all -y && \
-#    setcap 'cap_net_bind_service=+ep' /usr/sbin/slapd && \
-#    mkdir -p /var/lib/ldap && \
-#    chmod a+rwx -R /var/lib/ldap && \
-#    mkdir -p /etc/openldap && \
-#    chmod a+rwx -R /etc/openldap && \
-#    mkdir -p /var/run/openldap && \
-#    chmod a+rwx -R /var/run/openldap && \
-#    chmod -R a+rw /opt/openshift
-
 # Set OpenLDAP data and config directories in a data volume
 VOLUME ["/var/lib/ldap", "/etc/openldap"]
 
